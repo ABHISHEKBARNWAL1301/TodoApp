@@ -51,11 +51,15 @@ from fastapi.middleware.cors import CORSMiddleware
 todos = [
     {
         "id": "1",
-        "item": "Read a book."
+        "item": "Read a novel."
     },
     {
         "id": "2",
         "item": "Cycle around town."
+    },
+    {
+        "id": "3",
+        "item": "Have Lunch"
     }
 ]
 
