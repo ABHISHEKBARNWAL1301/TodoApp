@@ -1,80 +1,15 @@
-# from pymongo.errors import ConnectionFailure
-# from pymongo import MongoClient
-# from model import db, Todo
+from model import Todo
+from starlette.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException
 
-# client = MongoClient("mongodb://localhost:27017/my")
-# db = client["my"]
-# collection = db["my"]
-
-
-
-
-
-# @app.get("/")
-# async def read_root():
-#     return {"Hello": "World"}
-
-# # for getting all todos
-
-# # @app.get("/todo")
-# # async def get_todos() -> dict:
-# #     students = await db["my"].find().to_list(1000)
-# #     return students
-
-
-# @app.get("/todo")
-# async def get_todos():
-#     todos = []
-#     async for student in collection.find():
-#         todos.append(student)
-#     return todos
-
-
-# # @app.get("/items/{item_id}")
-# # async def read_item(item_id: str):
-# #     item = await collection.find_one({"_id": item_id})
-# #     return item
-
-
-# # for posting a todo item
-
-# @app.post("/todo")
-# async def add_todo(todo: dict):
-#     result = await collection.insert_one(todo)
-#     return result
-
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-
-todos = [
-    {
-        "id": "1",
-        "item": "Read a novel."
-    },
-    {
-        "id": "2",
-        "item": "Cycle around town."
-    },
-    {
-        "id": "3",
-        "item": "Have Lunch"
-    }
-]
-
+from .database import *
 
 app = FastAPI()
-
-origins = [
-    "http://localhost:3000",
-    "localhost:3000"
-]
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -86,42 +21,36 @@ async def read_root() -> dict:
     return {"message": "Welcome to your todo list."}
 
 
-@app.get("/todo", tags=["todos"])
-async def get_todos() -> dict:
-    return {"data": todos}
+@app.get("/todo")
+async def get_todo() -> dict:
+    response = await fetch_all_todos()
+    return {"data": response}
 
 
-@app.post("/todo", tags=["todos"])
-async def add_todo(todo: dict) -> dict:
-    todos.append(todo)
-    return {
-        "data": {"Todo added."}
-    }
+# @app.get("/todo")
+# async def get_todos() -> dict:
+#     return {"data": todos}
 
 
-@app.put("/todo/{id}", tags=["todos"])
-async def update_todo(id: int, body: dict) -> dict:
-    for todo in todos:
-        if int(todo["id"]) == id:
-            todo["item"] = body["item"]
-            return {
-                "data": f"Todo with id {id} has been updated."
-            }
-
-    return {
-        "data": f"Todo with id {id} not found."
-    }
+@app.post("/todo", response_model=Todo)
+async def post_todo(todo: Todo):
+    response = await create_todo(todo.dict())
+    if response:
+        return response
+    raise HTTPException(400, "Something went wrong")
 
 
-@app.delete("/todo/{id}", tags=["todos"])
-async def delete_todo(id: int) -> dict:
-    for todo in todos:
-        if int(todo["id"]) == id:
-            todos.remove(todo)
-            return {
-                "data": f"Todo with id {id} has been removed."
-            }
+@app.put("/todo/{id}", response_model=Todo)
+async def put_todo(id: int, body: dict) -> dict:
+    response = await update_todo(id, body)
+    if response:
+        return response
+    raise HTTPException(404, f"There is no todo with the id {id}")
 
-    return {
-        "data": f"Todo with id {id} not found."
-    }
+
+@app.delete("/todo/{id}")
+async def delete_todo(id):
+    response = await remove_todo(id)
+    if response:
+        return "Successfully deleted todo"
+    raise HTTPException(404, f"There is no todo with the title {id}")

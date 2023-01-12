@@ -19,24 +19,30 @@ import {
 
 const TodosContext = React.createContext({
     todos: [], fetchTodos: () => { }
-})
+});
 
 export default function Todos() {
-    const [todos, setTodos] = useState([])
+    const [todos, setTodos] = useState([]);
     const fetchTodos = async () => {
-        const response = await fetch("http://localhost:8000/todo")
-        const todos = await response.json()
-        setTodos(todos.data)
-    }
+        const response = await fetch("http://localhost:8000/todo");
+
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+        
+        const todos = await response.json();
+        console.log(todos);
+        setTodos(todos.data);
+    };
     useEffect(() => {
-        fetchTodos()
-    }, [])
+        fetchTodos();
+    }, []);
     return (
         <TodosContext.Provider value={{ todos, fetchTodos }}>
             <AddTodo />
             <Stack spacing={5}>
                 {
-                    todos.map((todo) => (
+                     todos.map((todo) => (
                         <TodoHelper item={todo.item} id={todo.id} fetchTodos={fetchTodos} />
                     ))
                 }
@@ -55,7 +61,7 @@ function AddTodo() {
 
     const handleSubmit = (event) => {
         const newTodo = {
-            "id": todos.length + 1,
+            "_id": todos.length + 1,
             "item": item
         }
 
