@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class Todo(BaseModel):
-    _id: int
-    # id : int
-    item: str
+    id: int = Field(None, alias="id")
+    item: str = Field(None, alias="item")

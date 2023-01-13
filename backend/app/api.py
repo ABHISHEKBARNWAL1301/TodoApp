@@ -22,14 +22,9 @@ async def read_root() -> dict:
 
 
 @app.get("/todo")
-async def get_todo() -> dict:
+async def get_todo():
     response = await fetch_all_todos()
     return {"data": response}
-
-
-# @app.get("/todo")
-# async def get_todos() -> dict:
-#     return {"data": todos}
 
 
 @app.post("/todo", response_model=Todo)
@@ -41,7 +36,7 @@ async def post_todo(todo: Todo):
 
 
 @app.put("/todo/{id}", response_model=Todo)
-async def put_todo(id: int, body: dict) -> dict:
+async def put_todo(id: int, body: Todo) -> Todo:
     response = await update_todo(id, body)
     if response:
         return response
@@ -49,7 +44,7 @@ async def put_todo(id: int, body: dict) -> dict:
 
 
 @app.delete("/todo/{id}")
-async def delete_todo(id):
+async def delete_todo(id:int):
     response = await remove_todo(id)
     if response:
         return "Successfully deleted todo"
