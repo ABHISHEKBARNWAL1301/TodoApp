@@ -72,7 +72,7 @@ function AddTodo() {
 
     const handleSubmit = (event) => {
         const newTodo = {
-            "id": todos.length + 1,
+            "id": Math.floor((Math.random() * 100000) + 1),
             "item": item
         }
 
