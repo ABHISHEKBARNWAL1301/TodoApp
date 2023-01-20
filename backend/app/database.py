@@ -3,14 +3,10 @@ import urllib
 from model import Todo
 
 # client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
-client = motor.motor_asyncio.AsyncIOMotorClient(
-    'mongodb+srv://ABHISHEKBARNWAL:'+ urllib.parse.quote("MtoD@1301") + '@cluster0.lgrlsok.mongodb.net/Todo?retryWrites=true&w=majority')
+client = motor.motor_asyncio.AsyncIOMotorClient('mongodb+srv://ABHISHEKBARNWAL:'+ urllib.parse.quote("MtoD@1301") + '@cluster0.lgrlsok.mongodb.net/Todo?retryWrites=true&w=majority')
 
 database = client.Todo
 collection = database.todo
-
-# client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
-# db = client.college
 
 
 async def fetch_all_todos():
